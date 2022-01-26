@@ -32,7 +32,7 @@ export default function PaginaInicial() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: appConfig.theme.colors.primary["200"],
+          backgroundColor: appConfig.theme.colors.primary["400"],
           backgroundImage:
             "url(https://wallpapercave.com/wp/wp1828028.jpg)",
           backgroundRepeat: "no-repeat",
