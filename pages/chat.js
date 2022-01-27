@@ -1,19 +1,35 @@
 import { Box, Text, TextField, Image, Button } from "@skynexui/components";
-import React from "react";
+import { createClient } from "@supabase/supabase-js";
+import { useState, useEffect, React } from "react";
 import appConfig from "../config.json";
 
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzMwNjEzOCwiZXhwIjoxOTU4ODgyMTM4fQ.aVlFqykhIPv0nV8aRsHYtiAoPZO9_HOg0XmnpvfDb0c";
+const SUPABASE_URL = "https://flrisvsemipnowiipmwg.supabase.co";
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 export default function ChatPage() {
-  const [mensagem, setMensagem] = React.useState("");
-  const [listaDeMensagens, setListaDeMensagens] = React.useState([]);
+  const [mensagem, setMensagem] = useState("");
+  const [listaDeMensagens, setListaDeMensagens] = useState([]);
+
+  useEffect(() => {
+    supabaseClient
+      .from("mensagens")
+      .select("*")
+      .order("id", { ascending: false })
+      .then(({ data }) => setListaDeMensagens(data));
+  }, []);
 
   function handleNovaMensagem(novaMensagem) {
     const mensagem = {
-      id: listaDeMensagens.length + 1,
       de: "lpcampelo",
       texto: novaMensagem,
     };
 
-    setListaDeMensagens([mensagem, ...listaDeMensagens]);
+    supabaseClient
+      .from("mensagens")
+      .insert([mensagem])
+      .then(({ data }) => setListaDeMensagens([data[0], ...listaDeMensagens]));
     setMensagem("");
   }
 
@@ -100,9 +116,9 @@ export default function ChatPage() {
                 contrastColor: appConfig.theme.colors.neutrals["000"],
                 mainColor: appConfig.theme.colors.primary[600],
                 mainColorLight: appConfig.theme.colors.primary[500],
-                mainColorStrong: appConfig.theme.colors.primary[800]
+                mainColorStrong: appConfig.theme.colors.primary[800],
               }}
-              styleSheet={{               
+              styleSheet={{
                 padding: "12px 81px",
                 marginBottom: "10px",
               }}
@@ -133,7 +149,7 @@ function Header() {
             contrastColor: appConfig.theme.colors.neutrals["000"],
             mainColor: appConfig.theme.colors.neutrals["000"],
             mainColorLight: appConfig.theme.colors.primary[600],
-            mainColorStrong: appConfig.theme.colors.primary[800]
+            mainColorStrong: appConfig.theme.colors.primary[800],
           }}
           label="Logout"
           href="/"
@@ -183,7 +199,7 @@ function MessageList(props) {
                   display: "inline-block",
                   marginRight: "8px",
                 }}
-                src={`https://github.com/lpcampelo.png`}
+                src={`https://github.com/${mensagem.de}.png`}
               />
               <Text tag="strong">{mensagem.de}</Text>
               <Text
